@@ -196,8 +196,7 @@ int main()
 	{
 		cout << "Round " << turn << "!" << endl; //Show round number
 
-		printf("\n");
-
+		printf("\nNinjas:\n");
 		for (int x = 0; x < 2; x++) //List Ninja's stats
 		{
 			if (ninj[x].alive)
@@ -209,7 +208,7 @@ int main()
 				cout << ninj[x].name << " is dead!" << endl;
 		}
 
-		printf("\n");
+		printf("\nZambies:\n");
 
 		for (int x = 0; x < 2; x++) //List Zambie's stats
 		{
@@ -276,7 +275,7 @@ int main()
 							{
 								if (zamb[x-1].alive)
 								{
-									nAttack(zamb, ninj, x, y);
+									nSteal(zamb, ninj, x, y);
 									break;
 								}
 								else
