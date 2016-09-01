@@ -19,10 +19,11 @@ guaranteed win for the character with the highest health.
 -The text feedback is often gramatically incorrect. This is unprofessional
 unless it the goal is a comedic effect.
 -Giving a multiple-character input will make the game automate each character.
+-There are multiple Zambies and Ninjas, two of which are not used.
 
 I will add/fix the missing functions and refine the interface between the user and
-game. I will be cleaning up unused variables. I will also be adding randomization 
-for a sense of luck. 
+game. I will add multi-character functions to the game, and I will also be adding 
+randomization for a sense of luck. 
 */
 
 struct Zambie
@@ -56,7 +57,7 @@ int zAttack(Zambie z[], Ninja n[])
 
 	for (int x = 0; x < 2; x++)
 	{
-		if (z[x].spirit > 0)
+		if (z[x].spirit > 0 && z[x].alive == true)
 		{
 			y = rand() % 2;
 
@@ -66,6 +67,8 @@ int zAttack(Zambie z[], Ninja n[])
 			z[x].spirit -= 1;
 			cout << z[x].name << "'s spirit is now " << z[y].spirit << "." << endl;
 		}
+		else if (!z[x].alive)
+			cout << z[x].name << " is dead!" << endl;
 		else
 			cout << z[x].name << " has no more spirit! He cannot attack!" << endl;
 	}
@@ -170,12 +173,12 @@ the chances of winning a bit tricky. The user must play their moves wisely in or
 
 int main()
 {
-	Zambie zamb[2];
+	Zambie zamb[2]; //Initializing Zambies
 
 	zamb[0] = { 100, true, 10, "Chris" };
 	zamb[1] = { 100, true, 10, "Matthew" };
 
-	Ninja ninj[2];
+	Ninja ninj[2]; //Initilizing Ninjas
 
 	ninj[0] = { 100, true, 10, "Regi" };
 	ninj[1] = { 100, true, 10, "Wilson" };
@@ -187,85 +190,107 @@ int main()
 	cout << "Zambies vs Ninjas!" << endl;
 
 
-	while (!end)
+	//START
+
+
+	while (!end) //GAME LOOP
 	{
-		cout << "Round " << turn << "!" << endl;
+		cout << "Round " << turn << "!" << endl; //Show round number
 
 		printf("\n");
 
-		for (int x = 0; x < 2; x++)
+		for (int x = 0; x < 2; x++) //List Ninja's stats
 		{
-			cout << ninj[x].name << "'s health: " << ninj[x].health << endl;
-			cout << ninj[x].name << "'s chi: " << ninj[x].chi << endl;
-
-		}
-
-		printf("\n");
-
-		for (int x = 0; x < 2; x++)
-		{
-			cout << zamb[x].name << "'s health: " << zamb[x].health << endl;
-			cout << zamb[x].name << "'s spirit: " << zamb[x].spirit << endl;
-
-		}
-
-		printf("\n");
-
-		for (int y = 0; y < 2; y++)
-		{
-			cout << "What will " << ninj[y].name << " do?" << endl;
-			cout << "a. Fight   b. Heal   c. Steal   q. Quit" << endl;
-
-			while (true)
+			if (ninj[x].alive)
 			{
-				getline(cin, input);
-				int x;
+				cout << ninj[x].name << "'s health: " << ninj[x].health << endl;
+				cout << ninj[x].name << "'s chi: " << ninj[x].chi << endl;
+			}
+			else
+				cout << ninj[x].name << " is dead!" << endl;
+		}
 
-				if (input[0] == 'a')
+		printf("\n");
+
+		for (int x = 0; x < 2; x++) //List Zambie's stats
+		{
+			if (zamb[x].alive)
+			{
+				cout << zamb[x].name << "'s health: " << zamb[x].health << endl;
+				cout << zamb[x].name << "'s spirit: " << zamb[x].spirit << endl;
+			}
+			else
+				cout << zamb[x].name << " is dead!" << endl;
+		}
+
+		printf("\n");
+
+		for (int y = 0; y < 2; y++) //Cycles through options for both Ninjas
+		{
+			if (ninj[y].alive)
+			{
+				cout << "What will " << ninj[y].name << " do?" << endl;
+				cout << "a. Fight   b. Heal   c. Steal   q. Quit" << endl;
+
+				while (true)
 				{
-					cout << "Which Zambie will you attack?" << endl;
-					cout << "1. Chris   2. Matthew" << endl;
-					cin >> x;
+					getline(cin, input);
+					int x;
 
-					while (true)
+					if (input[0] == 'a')
 					{
-						if (x == 1 || x == 2)
+						while (true) //This loop makes sure you select only 1 or 2, and the defending Zambie is alive.
 						{
-							nAttack(zamb, ninj, x, y);
-							break;
-						}
-						else
-							cout << "Invalid number!" << endl;
-					}
-					break;
-				}
-				else if (input[0] == 'b')
-				{
-					nHeal(ninj, y);
-					break;
-				}
-				else if (input[0] == 'c')
-				{
-					cout << "Which Zambie will you steal from?" << endl;
-					cout << "1. Chris   2. Matthew" << endl;
-					cin >> x;
+							cout << "Which Zambie will you attack?" << endl;
+							cout << "1. Chris   2. Matthew" << endl;
+							cin >> x;
 
-					while (true)
-					{
-						if (x == 1 || x == 2)
-						{
-							nSteal(zamb, ninj, x, y);
-							break;
+							if (x == 1 || x == 2 && zamb[x].alive == true)
+							{
+								nAttack(zamb, ninj, x, y);
+								break;
+							}
+							else if (x == 1 || x == 2 && zamb[x].alive == false)
+							{
+								cout << zamb[x].name << " is dead! You cannot attack him." << endl;
+							}
+							else
+							{
+								cout << "Invalid number!" << endl;
+							} 
 						}
-						else
-							cout << "Invalid number!" << endl;
+						break;
 					}
-					break;
-				}
-				else if (input[0] == 'q')
-				{
-					end = true;
-					break;
+					else if (input[0] == 'b')
+					{
+						nHeal(ninj, y);
+						break;
+					}
+					else if (input[0] == 'c')
+					{
+						while (true) //This loop makes sure you select only 1 or 2, and the defending Zambie is alive.
+						{
+							cout << "Which Zambie will you steal from?" << endl;
+							cout << "1. Chris   2. Matthew" << endl;
+							cin >> x;
+
+							if (x == 1 || x == 2 && zamb[x].alive == true)
+							{
+								nSteal(zamb, ninj, x, y);
+								break;
+							}
+							else if (x == 1 || x == 2 && zamb[x].alive == false)
+								cout << zamb[x].name << " is dead! You cannot steal from him." << endl;
+							else
+								cout << "Invalid number!" << endl;
+						}
+						break;
+					}
+					else if (input[0] == 'q')
+					{
+						end = true;
+						break;
+					}
 				}
 			}
 		}
@@ -273,20 +298,20 @@ int main()
 		if (!end)
 		{
 			printf("\n");
-			checkAlive(zamb, ninj);
 
-			for (int i = 0; i < 2; i++)
+			checkAlive(zamb, ninj); //After all turns end, we check health stats and set "alive" to false if any are under 1.
+
+			//After, we check who is alive. If a team is dead, the other team wins!
+
+			if (!zamb[0].alive && !zamb[1].alive) 
 			{
-				if (!ninj[i].alive)
-				{
-					cout << ninj[i].name << " is dead!" << endl;
-					break;
-				}
-				else if (!zamb[i].alive)
-				{
-					cout << zamb[i].name << " is dead!" << endl;
-					break;
-				}
+				cout << "All Zambies are dead! Ninjas win!" << endl;
+				break;
+			}
+
+			if (!ninj[0].alive && !ninj[0].alive)
+			{
+				cout << "All Ninjas are dead! Game over." << endl;
 			}
 
 			if (ninj[0].chi < 1 && zamb[0].spirit < 1 && ninj[1].chi < 1 && zamb[1].spirit < 1)
@@ -294,6 +319,8 @@ int main()
 				cout << "No one has chi or spirit! The battle cannot continue." << endl;
 				break;
 			}
+
+			//Zombies attack
 
 			zAttack(zamb, ninj);
 			printf("\n");
