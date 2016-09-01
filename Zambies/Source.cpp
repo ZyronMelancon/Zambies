@@ -52,8 +52,7 @@ The battle will stop if both characters' chi and spirit drop below 1. */
 int zAttack(Zambie z[], Ninja n[])
 {
 	int y;
-
-	int randomAttack = rand() % 30 + 1; 
+	int randomAttack; 
 
 	for (int x = 0; x < 2; x++)
 	{
@@ -62,6 +61,7 @@ int zAttack(Zambie z[], Ninja n[])
 			if (z[x].spirit > 0 && z[x].alive == true)
 			{
 				y = rand() % 2;
+				randomAttack = rand() % 30 + 1;
 
 				cout << z[x].name << " is attacking " << n[y].name << "!" << endl;
 				n[y].health -= randomAttack;
