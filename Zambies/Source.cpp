@@ -57,20 +57,23 @@ int zAttack(Zambie z[], Ninja n[])
 
 	for (int x = 0; x < 2; x++)
 	{
-		if (z[x].spirit > 0 && z[x].alive == true)
+		if (z[x].alive)
 		{
-			y = rand() % 2;
+			if (z[x].spirit > 0 && z[x].alive == true)
+			{
+				y = rand() % 2;
 
-			cout << z[x].name << " is attacking " << n[y].name << "!" << endl;
-			n[y].health -= randomAttack;
-			cout << n[y].name << " took " << randomAttack << " damage. His health is now " << n[y].health << "." << endl;
-			z[x].spirit -= 1;
-			cout << z[x].name << "'s spirit is now " << z[y].spirit << "." << endl;
+				cout << z[x].name << " is attacking " << n[y].name << "!" << endl;
+				n[y].health -= randomAttack;
+				cout << n[y].name << " took " << randomAttack << " damage. His health is now " << n[y].health << "." << endl;
+				z[x].spirit -= 1;
+				cout << z[x].name << "'s spirit is now " << z[y].spirit << "." << endl;
+			}
+			else if (!n[y].alive)
+				cout << n[y].name << " is dead!" << endl;
+			else
+				cout << z[x].name << " has no more spirit! He cannot attack!" << endl;
 		}
-		else if (!z[x].alive)
-			cout << z[x].name << " is dead!" << endl;
-		else
-			cout << z[x].name << " has no more spirit! He cannot attack!" << endl;
 	}
 
 	return 1;
@@ -154,13 +157,9 @@ int checkAlive(Zambie z[], Ninja n[])
 	{
 		if (z[i].health < 1)
 			z[i].alive = false;
-		else
-			z[i].alive = true;
 
 		if (n[i].health < 1)
 			n[i].alive = false;
-		else
-			n[i].alive = true;
 	}
 	return 1;
 }
@@ -245,19 +244,18 @@ int main()
 							cout << "1. Chris   2. Matthew" << endl;
 							cin >> x;
 
-							if (x == 1 || x == 2 && zamb[x].alive == true)
+							if (x == 1 || x == 2)
 							{
-								nAttack(zamb, ninj, x, y);
-								break;
-							}
-							else if (x == 1 || x == 2 && zamb[x].alive == false)
-							{
-								cout << zamb[x].name << " is dead! You cannot attack him." << endl;
+								if (zamb[x-1].alive)
+								{
+									nAttack(zamb, ninj, x, y);
+									break;
+								}
+								else
+									cout << zamb[x].name << " is dead! You cannot attack him." << endl;
 							}
 							else
-							{
 								cout << "Invalid number!" << endl;
-							} 
 						}
 						break;
 					}
@@ -274,13 +272,16 @@ int main()
 							cout << "1. Chris   2. Matthew" << endl;
 							cin >> x;
 
-							if (x == 1 || x == 2 && zamb[x].alive == true)
+							if (x == 1 || x == 2)
 							{
-								nSteal(zamb, ninj, x, y);
-								break;
+								if (zamb[x-1].alive)
+								{
+									nAttack(zamb, ninj, x, y);
+									break;
+								}
+								else
+									cout << zamb[x].name << " is dead! You cannot attack him." << endl;
 							}
-							else if (x == 1 || x == 2 && zamb[x].alive == false)
-								cout << zamb[x].name << " is dead! You cannot steal from him." << endl;
 							else
 								cout << "Invalid number!" << endl;
 						}
