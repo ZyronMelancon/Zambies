@@ -26,20 +26,13 @@ game. I will add multi-character functions to the game, and I will also be addin
 randomization for a sense of luck. 
 */
 
-struct Zambie
+struct Chara
 {
 	int health;
 	bool alive;
-	int spirit;
+	int mana;
 	string name;
-};
-
-struct Ninja
-{
-	int health;
-	bool alive;
-	int chi;
-	string name;
+	int type;
 };
 
 /* The functions of Spirit and Chi are equivalent. A Ninja needs chi for various moves,
@@ -49,7 +42,7 @@ The battle will stop if both characters' chi and spirit drop below 1. */
 
 /* Zambie attack sequence */
 
-int zAttack(Zambie z[], Ninja n[])
+void Attack(Chara z[])
 {
 	int y;
 	int randomAttack; 
@@ -58,46 +51,44 @@ int zAttack(Zambie z[], Ninja n[])
 	{
 		if (z[x].alive)
 		{
-			if (z[x].spirit > 0 && z[x].alive == true)
+			if (z[x].mana > 0 && z[x].alive == true)
 			{
-				y = rand() % 2;
+				y = rand() % 2 + 2;
 				randomAttack = rand() % 30 + 1;
 
-				cout << z[x].name << " is attacking " << n[y].name << "!" << endl;
-				n[y].health -= randomAttack;
-				cout << n[y].name << " took " << randomAttack << " damage. His health is now " << n[y].health << "." << endl;
-				z[x].spirit -= 1;
-				cout << z[x].name << "'s spirit is now " << z[y].spirit << "." << endl;
+				cout << z[x].name << " is attacking " << z[y].name << "!" << endl;
+				z[y].health -= randomAttack;
+				cout << z[y].name << " took " << randomAttack << " damage. His health is now " << z[y].health << "." << endl;
+				z[x].mana -= 1;
+				cout << z[x].name << "'s spirit is now " << z[y].mana << "." << endl;
 			}
-			else if (!n[y].alive)
-				cout << n[y].name << " is dead!" << endl;
+			else if (!z[y].alive)
+				cout << z[y].name << " is dead!" << endl;
 			else
 				cout << z[x].name << " has no more spirit! He cannot attack!" << endl;
 		}
 	}
-
-	return 1;
 }
 
 
 /* Ninja attack sequence */
 
-int nAttack(Zambie z[], Ninja n[], int x, int y)
+int Attack(Chara z[], int x, int y)
 {
 	x--;
 
 	int random = rand() % 30 + 1;
 
-	if (n[y].chi > 0)
+	if (z[y].mana > 0)
 	{
-		cout << n[y].name << " is attacking " << z[x].name << "!" << endl;
+		cout << z[y].name << " is attacking " << z[x].name << "!" << endl;
 		z[x].health -= random;
 		cout << z[x].name << " took " << random << " damage. His health is now " << z[x].health << "." << endl;
-		n[y].chi -= 1;
-		cout << n[y].name << "'s chi is now " << n[y].chi << "." << endl;
+		z[y].mana -= 1;
+		cout << z[y].name << "'s chi is now " << z[y].mana << "." << endl;
 	}
 	else
-		cout << n[y].name << " has no more chi! He cannot attack!" << endl;
+		cout << z[y].name << " has no more chi! He cannot attack!" << endl;
 
 	return 1;
 }
@@ -105,22 +96,22 @@ int nAttack(Zambie z[], Ninja n[], int x, int y)
 
 /* This move allows a Ninja to steal a Zambie's spirit in exchange for a bit of health. */
 
-int nSteal(Zambie z[], Ninja n[], int x, int y)
+int Steal(Chara z[], int x, int y)
 {
 	x--;
 
 	int random = rand() % 3;
 	int random2 = rand() % 10 + 1;
 
-	if (z[x].spirit > 0)
+	if (z[x].mana > 0)
 	{
-		cout << n[y].name << " tests his luck and attempts to steal " << z[x].name << "'s spirit." << endl;
+		cout << z[y].name << " tests his luck and attempts to steal " << z[x].name << "'s spirit." << endl;
 
-		z[x].spirit -= random;
-		n[y].chi += random;
-		n[y].health -= random2;
-		cout << n[y].name << "'s chi is now " << n[y].chi << " and " << z[x].name << "'s spirit is now " << z[x].spirit << "." << endl;
-		cout << z[x].name << " attacked " << n[y].name << " during his vulnerability, bringing his health down to " << n[y].health << "." << endl;
+		z[x].mana -= random;
+		z[y].mana += random;
+		z[y].health -= random2;
+		cout << z[y].name << "'s chi is now " << z[y].mana << " and " << z[x].name << "'s spirit is now " << z[x].mana << "." << endl;
+		cout << z[x].name << " attacked " << z[y].name << " during his vulnerability, bringing his health down to " << z[y].health << "." << endl;
 	}
 	else
 		cout << "Zambie does not have any spirit to steal!" << endl;
@@ -131,16 +122,16 @@ int nSteal(Zambie z[], Ninja n[], int x, int y)
 
 /* This move allows a Ninja to heal by a random amount (up to 25) in exchange for 1 chi. */
 
-int nHeal(Ninja n[], int y)
+int Heal(Chara n[], int y)
 {
 	int random = rand() % 21 + 5;
 
-	if (n[y].chi > 0)
+	if (n[y].mana > 0)
 	{
 		cout << n[y].name << " used his chi to heal by " << random << "." << endl;
 		n[y].health += random;
-		n[y].chi -= 1;
-		cout << "His health is now " << n[y].health << " and he has " << n[y].chi << " chi." << endl;
+		n[y].mana -= 1;
+		cout << "His health is now " << n[y].health << " and he has " << n[y].mana << " chi." << endl;
 	}
 	else
 		cout << n[y].name << " has no more chi! He cannot heal!" << endl;
@@ -151,15 +142,12 @@ int nHeal(Ninja n[], int y)
 
 /* Here, we check if the characters' health is below 1. If so, their "alive" state is set to false. */
 
-int checkAlive(Zambie z[], Ninja n[])
+int checkAlive(Chara z[])
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (z[i].health < 1)
 			z[i].alive = false;
-
-		if (n[i].health < 1)
-			n[i].alive = false;
 	}
 	return 1;
 }
@@ -172,15 +160,13 @@ the chances of winning a bit tricky. The user must play their moves wisely in or
 
 int main()
 {
-	Zambie zamb[2]; //Initializing Zambies
+	Chara chara[4]; 
 
-	zamb[0] = { 100, true, 10, "Chris" };
-	zamb[1] = { 100, true, 10, "Matthew" };
+	chara[0] = { 100, true, 10, "Chris", 1 }; //Initializing Zambies
+	chara[1] = { 100, true, 10, "Matthew", 1 };
 
-	Ninja ninj[2]; //Initilizing Ninjas
-
-	ninj[0] = { 100, true, 10, "Regi" };
-	ninj[1] = { 100, true, 10, "Wilson" };
+	chara[2] = { 100, true, 10, "Regi", 2 }; //Initializing Ninjas
+	chara[3] = { 100, true, 10, "Wilson", 2 };
 
 	string input;
 	int turn = 1;
@@ -196,38 +182,26 @@ int main()
 	{
 		cout << "Round " << turn << "!" << endl; //Show round number
 
-		printf("\nNinjas:\n");
-		for (int x = 0; x < 2; x++) //List Ninja's stats
+		printf("\n");
+
+		for (int x = 0; x < 4; x++) 
 		{
-			if (ninj[x].alive)
+			if (chara[x].alive)
 			{
-				cout << ninj[x].name << "'s health: " << ninj[x].health << endl;
-				cout << ninj[x].name << "'s chi: " << ninj[x].chi << endl;
+				cout << chara[x].name << "'s health: " << chara[x].health << endl;
+				cout << chara[x].name << "'s chi: " << chara[x].mana << endl;
 			}
 			else
-				cout << ninj[x].name << " is dead!" << endl;
-		}
-
-		printf("\nZambies:\n");
-
-		for (int x = 0; x < 2; x++) //List Zambie's stats
-		{
-			if (zamb[x].alive)
-			{
-				cout << zamb[x].name << "'s health: " << zamb[x].health << endl;
-				cout << zamb[x].name << "'s spirit: " << zamb[x].spirit << endl;
-			}
-			else
-				cout << zamb[x].name << " is dead!" << endl;
+				cout << chara[x].name << " is dead!" << endl;
 		}
 
 		printf("\n");
 
-		for (int y = 0; y < 2; y++) //Cycles through options for both Ninjas
+		for (int y = 2; y < 4; y++) //Cycles through options for both Ninjas
 		{
-			if (ninj[y].alive)
+			if (chara[y].alive)
 			{
-				cout << "What will " << ninj[y].name << " do?" << endl;
+				cout << "What will " << chara[y].name << " do?" << endl;
 				cout << "a. Fight   b. Heal   c. Steal   q. Quit" << endl;
 
 				while (true)
@@ -245,13 +219,13 @@ int main()
 
 							if (x == 1 || x == 2)
 							{
-								if (zamb[x-1].alive)
+								if (chara[x-1].alive)
 								{
-									nAttack(zamb, ninj, x, y);
+									Attack(chara, x, y);
 									break;
 								}
 								else
-									cout << zamb[x].name << " is dead! You cannot attack him." << endl;
+									cout << chara[x].name << " is dead! You cannot attack him." << endl;
 							}
 							else
 								cout << "Invalid number!" << endl;
@@ -260,7 +234,7 @@ int main()
 					}
 					else if (input[0] == 'b')
 					{
-						nHeal(ninj, y);
+						Heal(chara, y);
 						break;
 					}
 					else if (input[0] == 'c')
@@ -273,13 +247,13 @@ int main()
 
 							if (x == 1 || x == 2)
 							{
-								if (zamb[x-1].alive)
+								if (chara[x-1].alive)
 								{
-									nSteal(zamb, ninj, x, y);
+									Steal(chara, x, y);
 									break;
 								}
 								else
-									cout << zamb[x].name << " is dead! You cannot attack him." << endl;
+									cout << chara[x].name << " is dead! You cannot attack him." << endl;
 							}
 							else
 								cout << "Invalid number!" << endl;
@@ -299,22 +273,22 @@ int main()
 		{
 			printf("\n");
 
-			checkAlive(zamb, ninj); //After all turns end, we check health stats and set "alive" to false if any are under 1.
+			checkAlive(chara); //After all turns end, we check health stats and set "alive" to false if any are under 1.
 
 			//After, we check who is alive. If a team is dead, the other team wins!
 
-			if (!zamb[0].alive && !zamb[1].alive) 
+			if (!chara[0].alive && !chara[1].alive) 
 			{
 				cout << "All Zambies are dead! Ninjas win!" << endl;
 				break;
 			}
 
-			if (!ninj[0].alive && !ninj[0].alive)
+			if (!chara[2].alive && !chara[3].alive)
 			{
 				cout << "All Ninjas are dead! Game over." << endl;
 			}
 
-			if (ninj[0].chi < 1 && zamb[0].spirit < 1 && ninj[1].chi < 1 && zamb[1].spirit < 1)
+			if (chara[0].mana < 1 && chara[0].mana < 1 && chara[2].mana < 1 && chara[3].mana < 1)
 			{
 				cout << "No one has chi or spirit! The battle cannot continue." << endl;
 				break;
@@ -322,7 +296,7 @@ int main()
 
 			//Zombies attack
 
-			zAttack(zamb, ninj);
+			Attack(chara);
 			printf("\n");
 
 			system("pause");
